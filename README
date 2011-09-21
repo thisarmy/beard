@@ -22,8 +22,8 @@ specify widgets that have default system-wide snippets. These snippets can
 optionally be overridden in the template. The snippets can work as the "inner"
 parts of a template - sortof the reverse from Django/Jinja's blocks system - or
 they can be rendered in response to [[Widget]] placeholders in a second pass.
-That has the intended side-effect of making all "views" double "widgets" that
-can be placed anywhere.
+That has the intended side-effect of making all "views" double as "widgets"
+that can be placed anywhere.
 
 
 Template settings
