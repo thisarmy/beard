@@ -13,10 +13,9 @@ var Beard = function() {
         TEXTREQUIREDTAGS = ['Size', 'CSS', 'JS', 'Colour', 'Boolean', 'Font',
                             'Choice'],
         FILETYPETAGS = ['Image', 'Logo', 'CSS', 'JS'],
-        CLOSETAGS = [],
-        TAGS = [];
+        CLOSETAGS = [], // see below
+        TAGS = []; // see below
 
-    CLOSETAGS = [];
     for (var i in BLOCKTAGS) {
         CLOSETAGS.push('End'+BLOCKTAGS[i]);
     }
@@ -413,8 +412,6 @@ var Beard = function() {
 
                 d[this.itemName] = item;
 
-                //d = merge(d, item);
-
                 context.push(d);
                 for (var i in this.children) {
                     var child = this.children[i];
@@ -712,7 +709,6 @@ var Beard = function() {
         }
 
         var validateRequiredToken = function(setting) {
-            // TODO: should we split and extract label and help?
             var label = setting.stripped.split(' ').slice(1).join(' ');
             if (setting.children.length === 0) {
                 throw {
