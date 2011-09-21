@@ -3,7 +3,7 @@ Beard is a template setting and widget aware templating engine.
 Still working on some documentation, but see the tests for some usage examples
 in the meantime. It was built for Ammo, so you might get a better sense of the
 bigger picture by reading the templating documentation there:
-http://get.someammo.com/themes/documentation
+<http://get.someammo.com/themes/documentation>
 
 
 What? Why?
