@@ -7,14 +7,18 @@ var Beard = function() {
         BLOCKTAGS = ['Loop', 'If', 'Override',
                      'Size', 'Image', 'Logo', 'CSS', 'JS', 'Style', 'Variant',
                      'HTML', 'Colour', 'Boolean', 'Font', 'Choice'],
-        TEXTONLYTAGS = ['Size', 'Image', 'Logo', 'CSS', 'JS',
+        TEXTONLYTAGS = ['Size', 'Image', 'Logo', 'CSS', 'JS', 'Variant',
                         'HTML', 'Colour', 'Boolean', 'Font', 'Choice'],
-        SETTINGSTAGS = TEXTONLYTAGS.concat(['Style']),
+        SETTINGSTAGS = TEXTONLYTAGS.concat(['Style']), // see more below
         TEXTREQUIREDTAGS = ['Size', 'CSS', 'JS', 'Colour', 'Boolean', 'Font',
                             'Choice'],
         FILETYPETAGS = ['Image', 'Logo', 'CSS', 'JS'],
         CLOSETAGS = [], // see below
         TAGS = []; // see below
+
+    // Variant is the one exception to the rule that all text only tags are
+    // also settings tags.
+    SETTINGSTAGS.splice(SETTINGSTAGS.indexOf('Variant'), 1);
 
     for (var i in BLOCKTAGS) {
         CLOSETAGS.push('End'+BLOCKTAGS[i]);
@@ -176,7 +180,14 @@ var Beard = function() {
             return;
 
         } else if (ttype === 'Variant') {
-            // TODO
+            // Variants are sortof like settings...
+            var parts = splitSettingsToken(stripped),
+                label = parts.label,
+                help = parts.help;
+
+            this.label = label; //'Normal', 'Hover', etc.
+            this.help = help;
+            this.variableName = labelToVariableName(label);
             return;
 
         } else if (ttype === 'Var') {
@@ -1102,11 +1113,10 @@ var Beard = function() {
                 for (var i in token.children) {
                     var child = token.children[i];
                     if (child.ttype === 'Variant') {
-                        var tparts = splitSettingsToken(child.stripped);
                         variants.push({
-                            label: tparts.label,
-                            help: tparts.help,
-                            variableName: labelToVariableName(tparts.label),
+                            label: child.label,
+                            help: child.help,
+                            variableName: child.variableName,
                             defaultValue: getText(child)
                         });
                     }
