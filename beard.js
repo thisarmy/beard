@@ -6,12 +6,14 @@ var Beard = function() {
         META_END = ['}}', '__'],
         BLOCKTAGS = ['Loop', 'If', 'Override',
                      'Size', 'Image', 'Logo', 'CSS', 'JS', 'Style', 'Variant',
-                     'HTML', 'Colour', 'Boolean', 'Font', 'Choice'],
+                     'HTML', 'Colour', 'Boolean', 'Font', 'FontSize',
+                     'Choice'],
         TEXTONLYTAGS = ['Size', 'Image', 'Logo', 'CSS', 'JS', 'Variant',
-                        'HTML', 'Colour', 'Boolean', 'Font', 'Choice'],
+                        'HTML', 'Colour', 'Boolean', 'Font', 'FontSize',
+                        'Choice'],
         SETTINGSTAGS = TEXTONLYTAGS.concat(['Style']), // see more below
         TEXTREQUIREDTAGS = ['Size', 'CSS', 'JS', 'Colour', 'Boolean', 'Font',
-                            'Choice'],
+                            'FontSize', 'Choice'],
         FILETYPETAGS = ['Image', 'Logo', 'CSS', 'JS'],
         CLOSETAGS = [], // see below
         TAGS = []; // see below
@@ -32,8 +34,10 @@ var Beard = function() {
     };
 
     var labelToVariableName = function(label) {
-        var first = label[0].toLowerCase(),
-            rest = label.slice(1);
+        var
+            stripped = label.replace(/[^\s\w]/g, ''),
+            first = stripped[0].toLowerCase(),
+            rest = stripped.slice(1);
 
         rest = rest.replace(/\s+\w/g, function(str) {
             return str.replace(/\s+/, '').toUpperCase();
@@ -734,10 +738,12 @@ var Beard = function() {
 
             if (setting.ttype === 'Size') {
                 var rule = value,
-                    size = rule.substr(0, rule.length-1) - 0,
+                    sizeStr = rule.substr(0, rule.length-1),
+                    size = parseInt(sizeStr),
                     orient = rule[rule.length-1],
                     orients = ['S', 'W', 'H', 'M'];
-                if (!(size>0 && orients.indexOf(orient) !== -1)) {
+                if (sizeStr != size ||
+                        !(size>0 && orients.indexOf(orient) !== -1)) {
                     throw {
                         name: 'InvalidSizeError',
                         message: label+' must be a positive integer followed '+
@@ -770,6 +776,41 @@ var Beard = function() {
                         token: valueToken
                     };
                 }
+            } else if (setting.ttype === 'FontSize') {
+                var size, sizeStr, unit;
+                if (value[value.length-1] == '%') {
+                    sizeStr = value.substr(0, value.length-1),
+                    size = parseFloat(sizeStr),
+                    unit = value.substr(value.length-1);
+                    if (sizeStr != size || !(size >= 50 && size <= 600)) {
+                        throw {
+                            name: 'FontSizeDefaultError',
+                            message: '%-based font size must be between '+
+                                '50% and 600% (inclusive).',
+                            token: valueToken
+                        };
+                    }
+                } else {
+                    sizeStr = value.substr(0, value.length-2),
+                    size = parseInt(sizeStr, 10),
+                    unit = value.substr(value.length-2);
+                    if (unit != 'px') {
+                        throw {
+                            name: 'FontSizeDefaultError',
+                            message: 'Font sizes must be specified in '+
+                                'pixels or percentages.',
+                            token: valueToken
+                        };
+                    }
+                    if (sizeStr != size || !(size >= 10 && size <= 100)) {
+                        throw {
+                            name: 'FontSizeDefaultError',
+                            message: 'px-based font size must be an integer '+
+                                'between 10px and 100px (inclusive).',
+                            token: valueToken
+                        };
+                    }
+                }
             }
         };
 
@@ -780,7 +821,9 @@ var Beard = function() {
             var branches = [],
                 snippetTags = [],
                 blockstack = [],
-                untiltype = null;
+                untiltype = null,
+                settingsByType = {},
+                imageSizes = {};
 
             var pushToken = function(token) {
                 // if we have tokens on the stack, add this token to the one
@@ -811,6 +854,33 @@ var Beard = function() {
 
                 // parse what goes on between the meta tags
                 token.parseValue(getFormatter);
+
+                // TODO: check the variable names
+                // (and remember that images and logos
+                //  share the same namespace)
+                // use settingsByType
+                if (SETTINGSTAGS.indexOf(token.ttype) !== -1) {
+                    var ttype = token.ttype;
+                    if (ttype === 'Logo') {
+                        ttype = 'Image';
+                    }
+                    if (!settingsByType[ttype]) {
+                        settingsByType[ttype] = {};
+                    }
+                    if (settingsByType[ttype][token.variableName]) {
+                        // throw error
+                        throw {
+                            name: 'DuplicateNameError',
+                            message: 'This label results in a duplicate '+
+                                'variable name. Settings of the same type '+
+                                'must have unique variable names. Images and '+
+                                'logos count as the same type.',
+                            token: token
+                        };
+                    } else {
+                        settingsByType[ttype][token.variableName] = 1;
+                    }
+                }
 
                 var parent = null;
                 if (blockstack.length) {
@@ -896,8 +966,23 @@ var Beard = function() {
                         var opentype = untiltype.slice(3);
                         if (TEXTREQUIREDTAGS.indexOf(opentype) !== -1) {
                             // this tag requires a text value
-                            var setting = blockstack[blockstack.length-1];
+                            var setting = blockstack[blockstack.length-1],
+                                valueToken, value;
                             validateRequiredToken(setting);
+
+                            valueToken = setting.children[0];
+                            value = valueToken.tvalue;
+                            if (setting.ttype === 'Size') {
+                                if (imageSizes[value]) {
+                                    throw {
+                                        name: 'DuplicateSizeError',
+                                        message: 'Images sizes must be unique',
+                                        token: valueToken
+                                    };
+                                } else {
+                                    imageSizes[value] = 1;
+                                }
+                            }
                         }
 
                         blockstack.pop();

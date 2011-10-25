@@ -473,6 +473,140 @@ exports.testChoiceSettings = function(test) {
     test.done();
 };
 
+exports.testMutipleSettingsWithSameName = function(test) {
+    // multiple sizes with the same name
+    test.expect(1);
+    var code = "{{size Small}}100W{{/size}}{{size Small}}200W{{/size}}",
+        template;
+    try {
+        template = new Template(code);
+    } catch(e) {
+        test.equals(e.name, "DuplicateNameError");
+    }
+    test.done();
+};
+exports.testMutipleSizesWithSameValue = function(test) {
+    test.expect(1);
+    var code = "{{size Small}}100W{{/size}}{{size Medium}}100W{{/size}}",
+        template;
+    try {
+        template = new Template(code);
+    } catch(e) {
+        test.equals(e.name, "DuplicateSizeError");
+    }
+    test.done();
+
+};
+exports.testImageAndLogoWithSameName = function(test) {
+    // image and logo with the same name
+    test.expect(1);
+    var code = "{{logo Logo}}{{/logo}}{{image Logo}}{{/image}}",
+        template;
+    try {
+        template = new Template(code);
+    } catch(e) {
+        test.equals(e.name, "DuplicateNameError");
+    }
+    test.done();
+};
+
+exports.testFontSizeWithWrongUnit = function(test) {
+    // FontSize with wrong unit
+    test.expect(1);
+    var code = "{{fontsize Text}}2em{{/fontsize}}",
+        template;
+    try {
+        template = new Template(code);
+    } catch(e) {
+        test.equals(e.name, "FontSizeDefaultError");
+    }
+    test.done();
+};
+exports.testFontSizeOutOfRange = function(test) {
+    // FontSize that's too small or too big
+    test.expect(1);
+    var code = "{{fontsize Text}}5px{{/fontsize}}",
+        template;
+    try {
+        template = new Template(code);
+    } catch(e) {
+        test.equals(e.name, "FontSizeDefaultError");
+    }
+    test.done();
+};
+exports.testFloatPixelFontSize = function(test) {
+    // pixel FontSize that's not an integer
+    test.expect(1);
+    var code = "{{fontsize Text}}12.5px{{/fontsize}}",
+        template;
+    try {
+        template = new Template(code);
+    } catch(e) {
+        test.equals(e.name, "FontSizeDefaultError");
+    }
+    test.done();
+};
+exports.testSizeRuleMissingOrientation = function(test) {
+    // image size that doesn't end with a valid character
+    test.expect(1);
+    var code = "{{size Small}}100{{/size}}",
+        template;
+    try {
+        template = new Template(code);
+    } catch(e) {
+        test.equals(e.name, "InvalidSizeError");
+    }
+    test.done();
+};
+exports.testSizeRuleTooSmall = function(test) {
+    // image size of zero
+    test.expect(1);
+    var code = "{{size Very Small}}0{{/size}}",
+        template;
+    try {
+        template = new Template(code);
+    } catch(e) {
+        test.equals(e.name, "InvalidSizeError");
+    }
+    test.done();
+};
+exports.testColourWithoutHash = function(test) {
+    // colour without #
+    test.expect(1);
+    var code = "{{colour Something Black}}000000{{/colour}}",
+        template;
+    try {
+        template = new Template(code);
+    } catch(e) {
+        test.equals(e.name, "ColourDefaultError");
+    }
+    test.done();
+};
+exports.testColourNotValid = function(test) {
+    // colour that's not 3 or 6 hex digits
+    test.expect(1);
+    var code = "{{colour Something Wrong}}#ff{{/colour}}",
+        template;
+    try {
+        template = new Template(code);
+    } catch(e) {
+        test.equals(e.name, "ColourDefaultError");
+    }
+    test.done();
+};
+exports.testInvalidBoolean = function(test) {
+    // boolean that's not true or false
+    test.expect(1);
+    var code = "{{boolean Will this work?}}No{{/boolean}}",
+        template;
+    try {
+        template = new Template(code);
+    } catch(e) {
+        test.equals(e.name, "BooleanDefaultError");
+    }
+    test.done();
+};
+
 // other tests
 
 exports.testAlternativeStyleTags = function(test) {
