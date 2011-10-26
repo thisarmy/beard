@@ -485,6 +485,7 @@ exports.testMutipleSettingsWithSameName = function(test) {
     }
     test.done();
 };
+/*
 exports.testMutipleSizesWithSameValue = function(test) {
     test.expect(1);
     var code = "{{size Small}}100W{{/size}}{{size Medium}}100W{{/size}}",
@@ -495,8 +496,8 @@ exports.testMutipleSizesWithSameValue = function(test) {
         test.equals(e.name, "DuplicateSizeError");
     }
     test.done();
-
 };
+*/
 exports.testImageAndLogoWithSameName = function(test) {
     // image and logo with the same name
     test.expect(1);

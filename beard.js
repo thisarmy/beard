@@ -822,8 +822,8 @@ var Beard = function() {
                 snippetTags = [],
                 blockstack = [],
                 untiltype = null,
-                settingsByType = {},
-                imageSizes = {};
+                settingsByType = {};
+                //imageSizes = {};
 
             var pushToken = function(token) {
                 // if we have tokens on the stack, add this token to the one
@@ -970,6 +970,7 @@ var Beard = function() {
                                 valueToken, value;
                             validateRequiredToken(setting);
 
+                            /*
                             valueToken = setting.children[0];
                             value = valueToken.tvalue;
                             if (setting.ttype === 'Size') {
@@ -983,6 +984,7 @@ var Beard = function() {
                                     imageSizes[value] = 1;
                                 }
                             }
+                            */
                         }
 
                         blockstack.pop();
