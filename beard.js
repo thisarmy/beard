@@ -780,13 +780,13 @@ var Beard = function() {
                 var size, sizeStr, unit;
                 if (value[value.length-1] == '%') {
                     sizeStr = value.substr(0, value.length-1),
-                    size = parseFloat(sizeStr),
+                    size = parseInt(sizeStr, 10),
                     unit = value.substr(value.length-1);
                     if (sizeStr != size || !(size >= 50 && size <= 600)) {
                         throw {
                             name: 'FontSizeDefaultError',
-                            message: '%-based font size must be between '+
-                                '50% and 600% (inclusive).',
+                            message: '%-based font size must be an integer '+
+                                'between 50% and 600% (inclusive).',
                             token: valueToken
                         };
                     }
